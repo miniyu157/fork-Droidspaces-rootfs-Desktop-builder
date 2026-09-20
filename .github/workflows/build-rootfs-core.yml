@@ -356,62 +356,67 @@ jobs:
           ENABLE_DOCKER: ${{ inputs.enable_docker }}
         run: |
           set -euo pipefail
+          # 选项说明就是 Actions 表单上那行文本，改表单时要同步改这里
+          option() { printf '%-26s: %-30s # %s\n' "$1" "$2" "$3"; }
+
           if [ "$UI_LANGUAGE" = zh ]; then
-            cat > release-notes.md <<EOF
-          Droidspaces 根文件系统自动构建
-          构建时间：$BUILD_TIME
-          构建目标：$BUILD_TARGET
-          构建 ID：$BUILD_ID
-
-          构建选项：
-          - **自定义用户名**：$CUSTOM_USERNAME
-          - **桌面环境**：$DESKTOP
-          - **桌面开机自启动**：$DESKTOP_AUTOSTART
-          - **显示后端**：$DISPLAY_BACKEND
-          - Wayland 软件包仓库：$WAYLAND_PACKAGE_REPOSITORY
-          - PulseAudio 音频转发：$PULSE_AUDIO
-          - Anland 音频说明：Wayland 模式使用 Anland 应用内置音频，无需 PulseAudio
-          - 移除 Ubuntu Snap：$ENABLE_NOSNAP
-          - systemd 257 旧内核兼容：$ENABLE_SYSTEMD257
-          - 使用中文并设置上海时区：$ENABLE_ZH_TZ
-          - 高通骁龙 GPU 支持：$ENABLE_MESA
-          - 修复骁龙 8 Gen 2 Wayland 显示异常：$ENABLE_8GEN2_WAYLAND
-          - 集成 TMOE：$ENABLE_TMOE
-          - Fcitx 5 输入法支持：$ENABLE_FCITX5
-          - 跨架构支持：$ENABLE_BINFMT
-          - 容器硬件和网络识别：$ENABLE_HARDWARE
-          - 开发工具：$ENABLE_DEV_TOOLS
-          - 压缩工具：$ENABLE_COMPRESSION
-          - Docker：$ENABLE_DOCKER
-          EOF
+            {
+              printf 'Droidspaces 根文件系统自动构建\n\n'
+              printf '构建时间：%s\n' "$BUILD_TIME"
+              printf '构建 ID：%s\n\n' "$BUILD_ID"
+              printf '构建选项（按 Actions 表单顺序）：\n'
+              printf '```\n'
+              option build_target "$BUILD_TARGET" "选择要构建的发行版"
+              option custom_username "$CUSTOM_USERNAME" "自定义用户名"
+              option desktop "$DESKTOP" "桌面选择"
+              option desktop_autostart "$DESKTOP_AUTOSTART" "桌面开机自启动"
+              option display_backend "$DISPLAY_BACKEND" "显示后端（KDE mobile/GNOME/Anland Next 固定使用 Anland Wayland）"
+              option PulseAudio "$PULSE_AUDIO" "PulseAudio 音频转发"
+              option enable_zh_tz "$ENABLE_ZH_TZ" "使用中文并设置上海时区"
+              option enable_mesa "$ENABLE_MESA" "开启高通骁龙 GPU 支持"
+              option enable_8gen2_wayland "$ENABLE_8GEN2_WAYLAND" "修复骁龙 8 Gen 2 Wayland 花屏"
+              option enable_tmoe "$ENABLE_TMOE" "集成 TMOE"
+              option nosnap "$ENABLE_NOSNAP" "移除 Ubuntu Snap"
+              option enable_systemd257 "$ENABLE_SYSTEMD257" "使用 systemd 257 包族（仅支持 none 和普通 KDE）"
+              option enable_srf "$ENABLE_FCITX5" "开启 fcitx5 输入法"
+              option enable_binfmt "$ENABLE_BINFMT" "开启跨架构支持"
+              option enable_yj "$ENABLE_HARDWARE" "开启 NAT 和硬件识别"
+              option enable_kfgj "$ENABLE_DEV_TOOLS" "安装开发工具"
+              option enable_zip "$ENABLE_COMPRESSION" "安装压缩工具"
+              option enable_docker "$ENABLE_DOCKER" "安装 Docker"
+              option wayland_package_repository "$WAYLAND_PACKAGE_REPOSITORY" "Wayland 软件包仓库（公开的 owner/repository）"
+              printf '```\n\n'
+              printf 'Anland 音频说明：Wayland 模式使用 Anland 应用内置音频，无需 PulseAudio\n'
+            } > release-notes.md
           else
-            cat > release-notes.md <<EOF
-          Droidspaces RootFS Automated Build
-          Build Time: $BUILD_TIME
-          Build Target (User Specified): $BUILD_TARGET
-          Build ID: $BUILD_ID
-
-          Build Options:
-          - **Custom Username**: $CUSTOM_USERNAME
-          - **Desktop**: $DESKTOP
-          - **Desktop auto-start**: $DESKTOP_AUTOSTART
-          - **Display backend**: $DISPLAY_BACKEND
-          - Wayland package repository: $WAYLAND_PACKAGE_REPOSITORY
-          - PulseAudio Audio Forwarding: $PULSE_AUDIO
-          - Anland audio note: Wayland mode uses the built-in Anland app audio, so PulseAudio is not needed
-          - nosnap: $ENABLE_NOSNAP
-          - systemd 257 old-kernel compatibility: $ENABLE_SYSTEMD257
-          - Use Chinese as Primary Language: $ENABLE_ZH_TZ
-          - Qualcomm Snapdragon GPU Support: $ENABLE_MESA
-          - Fix Snapdragon 8 Gen 2 Wayland display corruption: $ENABLE_8GEN2_WAYLAND
-          - Integrate TMOE: $ENABLE_TMOE
-          - Input Method Fcitx 5 Support: $ENABLE_FCITX5
-          - Cross-architecture Support: $ENABLE_BINFMT
-          - Container Hardware and Network Recognition Support: $ENABLE_HARDWARE
-          - Development Tools Integration: $ENABLE_DEV_TOOLS
-          - Compression Tools Integration: $ENABLE_COMPRESSION
-          - Docker Integration: $ENABLE_DOCKER
-          EOF
+            {
+              printf 'Droidspaces RootFS Automated Build\n\n'
+              printf 'Build Time: %s\n' "$BUILD_TIME"
+              printf 'Build ID: %s\n\n' "$BUILD_ID"
+              printf 'Build Options (in Actions form order):\n'
+              printf '```\n'
+              option build_target "$BUILD_TARGET" "Distribution to build"
+              option custom_username "$CUSTOM_USERNAME" "Custom username"
+              option desktop "$DESKTOP" "Desktop"
+              option desktop_autostart "$DESKTOP_AUTOSTART" "Start desktop on boot"
+              option display_backend "$DISPLAY_BACKEND" "Display backend (KDE mobile/GNOME/Anland Next always use Anland Wayland)"
+              option PulseAudio "$PULSE_AUDIO" "PulseAudio forwarding"
+              option enable_zh_tz "$ENABLE_ZH_TZ" "Use Chinese language and Asia/Shanghai timezone"
+              option enable_mesa "$ENABLE_MESA" "Enable Qualcomm Snapdragon GPU support"
+              option enable_8gen2_wayland "$ENABLE_8GEN2_WAYLAND" "Fix Snapdragon 8 Gen 2 Wayland corruption"
+              option enable_tmoe "$ENABLE_TMOE" "Integrate TMOE"
+              option nosnap "$ENABLE_NOSNAP" "Remove Ubuntu Snap"
+              option enable_systemd257 "$ENABLE_SYSTEMD257" "Use the systemd 257 package family (none and standard KDE only)"
+              option enable_srf "$ENABLE_FCITX5" "Enable fcitx5"
+              option enable_binfmt "$ENABLE_BINFMT" "Enable cross-architecture support"
+              option enable_yj "$ENABLE_HARDWARE" "Enable NAT and hardware recognition"
+              option enable_kfgj "$ENABLE_DEV_TOOLS" "Install development tools"
+              option enable_zip "$ENABLE_COMPRESSION" "Install compression tools"
+              option enable_docker "$ENABLE_DOCKER" "Install Docker"
+              option wayland_package_repository "$WAYLAND_PACKAGE_REPOSITORY" "Wayland package repository (public owner/repository)"
+              printf '```\n\n'
+              printf 'Anland audio note: Wayland mode uses the built-in Anland app audio, so PulseAudio is not needed\n'
+            } > release-notes.md
           fi
 
       - name: ${{ inputs.ui_language == 'zh' && '创建草稿 Release 并上传文件' || 'Stage draft Release and upload assets' }}
